@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import WebGLView from './src/components/WebGLView';
 import ImageButton from './src/components/ImageButton';
+import AttributeSlider from './src/components/AttributeSlider';
 import { assets } from './src/assets/assets.ts';
 import Toast from 'react-native-toast-message';
 import {
@@ -104,6 +105,96 @@ function App(): React.JSX.Element {
             }}
           />
         </View>
+        {selectedGeometry.type === 'cube' && (
+          <>
+            <AttributeSlider
+              label="Width"
+              min={0.25}
+              max={2}
+              value={selectedGeometry.width || 1}
+              onChange={(val) => setSelectedGeometry(prev => ({ ...prev, width: val }))}
+            />
+            <AttributeSlider
+              label="Height"
+              min={0.25}
+              max={2}
+              value={selectedGeometry.height || 1}
+              onChange={(val) => setSelectedGeometry(prev => ({ ...prev, height: val }))}
+            />
+            <AttributeSlider
+              label="Depth"
+              min={0.25}
+              max={2}
+              value={selectedGeometry.depth || 1}
+              onChange={(val) => setSelectedGeometry(prev => ({ ...prev, depth: val }))}
+            />
+          </>
+        )}
+        {selectedGeometry.type === 'sphere' && (
+          <>
+            <AttributeSlider
+              label="Radius"
+              min={0.125}
+              max={1}
+              value={selectedGeometry.radius || 0.5}
+              onChange={(val) => setSelectedGeometry(prev => ({ ...prev, radius: val }))}
+            />
+            <AttributeSlider
+              label="Latitude Bands"
+              min={3}
+              max={10}
+              step={1}
+              value={selectedGeometry.latitudeBands || 5}
+              onChange={(val) => setSelectedGeometry(prev => ({ ...prev, latitudeBands: val }))}
+            />
+            <AttributeSlider
+              label="Longitude Bands"
+              min={3}
+              max={10}
+              step={1}
+              value={selectedGeometry.longitudeBands || 5}
+              onChange={(val) => setSelectedGeometry(prev => ({ ...prev, longitudeBands: val }))}
+            />
+          </>
+        )}
+        {selectedGeometry.type === 'pyramid' && (
+          <>
+            <AttributeSlider
+              label="Edges"
+              min={3}
+              max={10}
+              step={1}
+              value={selectedGeometry.edges || 3}
+              onChange={(val) => setSelectedGeometry(prev => ({ ...prev, edges: val }))}
+            />
+            <AttributeSlider
+              label="Height"
+              min={0.25}
+              max={2}
+              value={selectedGeometry.height || 1}
+              onChange={(val) => setSelectedGeometry(prev => ({ ...prev, height: val }))}
+            />
+          </>
+        )}
+        {selectedGeometry.type === 'prism' && (
+          <>
+            <AttributeSlider
+              label="Edges"
+              min={3}
+              max={10}
+              step={1}
+              value={selectedGeometry.edges || 3}
+              onChange={(val) => setSelectedGeometry(prev => ({ ...prev, edges: val }))}
+            />
+            <AttributeSlider
+              label="Height"
+              min={0.25}
+              max={2}
+              value={selectedGeometry.height || 1}
+              onChange={(val) => setSelectedGeometry(prev => ({ ...prev, height: val }))}
+            />
+          </>
+        )}
       </ScrollView>
       <Toast /> 
     </View>
