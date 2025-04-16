@@ -30,7 +30,8 @@ function App(): React.JSX.Element {
   const safePadding = '5%';
 
   const [selectedGeometry, setSelectedGeometry] = useState<'cube' | 'pyramid' | 'prism' | 'sphere'>('cube');
-
+  const [colorGeometry, setColorGeometry] = useState<[number, number, number]>([0.0, 1.0, 0.0]);
+  
   return (
     <View style={backgroundStyle}>
       <StatusBar
@@ -57,41 +58,41 @@ function App(): React.JSX.Element {
           </View>
         </View>
         <View style={styles.container}>
-          <WebGLView geometry={selectedGeometry} color={[0.0, 1.0, 0.0]}/>
+          <WebGLView geometry={selectedGeometry} color={colorGeometry}/>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 20 }}>
           <ImageButton
             imageSource={assets.png.cubo}
             onPress={() => {
-              console.log("cube")
+              setColorGeometry([0.0, 0.0, 1.0]);
               setSelectedGeometry('cube');
             }}
           />
           <ImageButton
             imageSource={assets.png.piramide}
             onPress={() => {
-              console.log("pyramid")
+              setColorGeometry([1.0, 0.0, 1.0]);
               setSelectedGeometry('pyramid');
             }}
           />
           <ImageButton
             imageSource={assets.png.tetraedro}
             onPress={() => {
-              console.log("pyramid")
+              setColorGeometry([1.0, 0.0, 0.0]);
               setSelectedGeometry('pyramid');
             }}
           />
           <ImageButton
             imageSource={assets.png.prisma}
             onPress={() => {
-              console.log("prism")
+              setColorGeometry([0.0, 1.0, 0.0]);
               setSelectedGeometry('prism');
             }}
           />
           <ImageButton
             imageSource={assets.png.esfera}
             onPress={() => {
-              console.log("sphere")
+              setColorGeometry([1.0, 1.0, 0.0]);
               setSelectedGeometry('sphere');
             }}
           />

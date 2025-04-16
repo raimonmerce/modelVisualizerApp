@@ -8,6 +8,15 @@ import { PyramidGeometry } from '../graphics/geometry/PyramidGeometry';
 import { PrismGeometry } from '../graphics/geometry/PrismGeometry';
 import { Material } from '../graphics/Material';
 import { Mesh } from '../graphics/Mesh';
+import {
+  createPerspectiveMatrix,
+  createTranslationMatrix,
+  createLookAtMatrix,
+  createRotationMatrix,
+  createScaleMatrix,
+  multiplyMatrices
+} from '../utils/graphicUtils';
+
 import type { ExpoWebGLRenderingContext } from 'expo-gl';
 
 type WebGLViewProps = {
@@ -26,9 +35,9 @@ export default function WebGLView({ geometry, color }: WebGLViewProps) {
 }
 
 function onContextCreate(gl: ExpoWebGLRenderingContext, geometry: string, color: [number, number, number]) {
-  console.log("graphics", geometry, color)
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
   gl.clearColor(1, 1, 1, 1);
+  gl.enable(gl.DEPTH_TEST);
 
   let geometryObject: Geometry;
 
@@ -51,21 +60,38 @@ function onContextCreate(gl: ExpoWebGLRenderingContext, geometry: string, color:
 
   const [r, g, b] = color;
 
-  const colorMaterial = new Material(
-    `
-      attribute vec2 position;
-      void main() {
-        gl_Position = vec4(position, 0.0, 1.0);
-      }
-    `,
-    `
-      void main() {
-        gl_FragColor = vec4(${r}, ${g}, ${b}, 1.0); // Dynamic color
-      }
-    `
-  );
+  // const vertexShaderCode = `
+  //   attribute vec3 position;
+  //   uniform mat4 uMVPMatrix;
+  //   void main() {
+  //     gl_Position = uMVPMatrix * vec4(position, 1.0);
+  //   }
+  // `;
 
-  const mesh = new Mesh(geometryObject, colorMaterial);
+  const vertexShaderCode = `
+    attribute vec3 position;
+
+    uniform mat4 uTransformMatrix; // model matrix
+    uniform mat4 uViewMatrix;      // view/camera matrix
+    uniform mat4 uProjectionMatrix; // optional if you're adding perspective later
+
+    void main() {
+      // Order: projection * view * model * position
+      gl_Position = uProjectionMatrix * uViewMatrix * uTransformMatrix * vec4(position, 1.0);
+      //gl_Position = uViewMatrix * uTransformMatrix * vec4(position, 1.0);
+    }
+  `;
+
+  const fragmentShaderCode = `
+    precision mediump float;
+    void main() {
+      gl_FragColor = vec4(${r}, ${g}, ${b}, 1.0);
+    }
+  `;
+
+  const colorMaterial = new Material(vertexShaderCode, fragmentShaderCode);
+
+  const mesh = new Mesh(geometryObject, colorMaterial, [0, 0, 0], [Math.PI/4, Math.PI/4, Math.PI/4], [1, 1, 1]);
 
   const program = gl.createProgram();
   const vertShader = gl.createShader(gl.VERTEX_SHADER);
@@ -73,14 +99,26 @@ function onContextCreate(gl: ExpoWebGLRenderingContext, geometry: string, color:
 
   gl.shaderSource(vertShader, mesh.material.vertexShader);
   gl.compileShader(vertShader);
+  
+  if (!gl.getShaderParameter(vertShader, gl.COMPILE_STATUS)) {
+    console.error("Vertex shader failed to compile:", gl.getShaderInfoLog(vertShader));
+  }
 
   gl.shaderSource(fragShader, mesh.material.fragmentShader);
   gl.compileShader(fragShader);
+
+  if (!gl.getShaderParameter(fragShader, gl.COMPILE_STATUS)) {
+    console.error("Fragment shader failed to compile:", gl.getShaderInfoLog(fragShader));
+  }
 
   gl.attachShader(program, vertShader);
   gl.attachShader(program, fragShader);
   gl.linkProgram(program);
   gl.useProgram(program);
+
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.error("Program failed to link:", gl.getProgramInfoLog(program));
+  }
 
   const vertexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -91,10 +129,35 @@ function onContextCreate(gl: ExpoWebGLRenderingContext, geometry: string, color:
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.geometry.indices, gl.STATIC_DRAW);
 
   const positionLocation = gl.getAttribLocation(program, 'position');
-  gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(positionLocation);
 
-  gl.clear(gl.COLOR_BUFFER_BIT);
+  const fov = Math.PI / 4; // 90° field of view
+  const aspect = gl.drawingBufferWidth / gl.drawingBufferHeight;
+  const near = 0.1;
+  const far = 100.0;
+
+  const cameraPosition: [number, number, number] = [0, 0, 3];
+  const target: [number, number, number] = [0, 0, 0];
+  const up: [number, number, number] = [0, 1, 0];  
+
+  const translationMatrix = createTranslationMatrix(mesh.position[0], mesh.position[1], mesh.position[2]);
+  const rotationMatrix = createRotationMatrix(mesh.rotation[0], mesh.rotation[1], mesh.rotation[2]);
+  const scaleMatrix = createScaleMatrix(mesh.scale[0], mesh.scale[1], mesh.scale[2]);
+  const transformMatrix = multiplyMatrices(translationMatrix, multiplyMatrices(rotationMatrix, scaleMatrix));
+
+  const viewMatrix = createLookAtMatrix(cameraPosition, target, up);
+  const projectionMatrix = createPerspectiveMatrix(fov, aspect, near, far);
+  
+  const transformMatrixLoc = gl.getUniformLocation(program, 'uTransformMatrix');
+  const viewMatrixLoc = gl.getUniformLocation(program, 'uViewMatrix');
+  const projectionMatrixLoc = gl.getUniformLocation(program, 'uProjectionMatrix');
+  
+  gl.uniformMatrix4fv(transformMatrixLoc, false, new Float32Array(transformMatrix));
+  gl.uniformMatrix4fv(viewMatrixLoc, false, new Float32Array(viewMatrix));
+  gl.uniformMatrix4fv(projectionMatrixLoc, false, new Float32Array(projectionMatrix));
+
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.drawElements(gl.TRIANGLES, mesh.geometry.indices.length, gl.UNSIGNED_SHORT, 0);
 
   gl.flush();
