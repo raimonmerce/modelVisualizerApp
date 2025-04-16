@@ -6,7 +6,7 @@ import { CubeGeometry } from '../graphics/geometry/CubeGeometry';
 import { SphereGeometry } from '../graphics/geometry/SphereGeometry';
 import { PyramidGeometry } from '../graphics/geometry/PyramidGeometry';
 import { PrismGeometry } from '../graphics/geometry/PrismGeometry';
-import { Material } from '../graphics/Material';
+import { StandardMaterial } from '../graphics/material/StandardMaterial';
 import { Mesh } from '../graphics/Mesh';
 import {
   createPerspectiveMatrix,
@@ -20,14 +20,14 @@ import {
 import type { ExpoWebGLRenderingContext } from 'expo-gl';
 
 type WebGLViewProps = {
-  geometry: 'cube' | 'sphere' | 'pyramid' | 'prism'; // Geometry types
-  color: [number, number, number]; // RGB color as an array
+  geometry: 'cube' | 'sphere' | 'pyramid' | 'prism';
+  color: [number, number, number];
 };
 
 export default function WebGLView({ geometry, color }: WebGLViewProps) {
     return (
       <GLView
-        key={`${geometry}-${color.join(',')}`} // force re-mount on geometry or color change
+        key={`${geometry}-${color.join(',')}`}
         style={{ width: 300, height: 300 }}
         onContextCreate={(gl) => onContextCreate(gl, geometry, color)}
       />
@@ -58,38 +58,7 @@ function onContextCreate(gl: ExpoWebGLRenderingContext, geometry: string, color:
       geometryObject = new CubeGeometry();
   }
 
-  const [r, g, b] = color;
-
-  // const vertexShaderCode = `
-  //   attribute vec3 position;
-  //   uniform mat4 uMVPMatrix;
-  //   void main() {
-  //     gl_Position = uMVPMatrix * vec4(position, 1.0);
-  //   }
-  // `;
-
-  const vertexShaderCode = `
-    attribute vec3 position;
-
-    uniform mat4 uTransformMatrix; // model matrix
-    uniform mat4 uViewMatrix;      // view/camera matrix
-    uniform mat4 uProjectionMatrix; // optional if you're adding perspective later
-
-    void main() {
-      // Order: projection * view * model * position
-      gl_Position = uProjectionMatrix * uViewMatrix * uTransformMatrix * vec4(position, 1.0);
-      //gl_Position = uViewMatrix * uTransformMatrix * vec4(position, 1.0);
-    }
-  `;
-
-  const fragmentShaderCode = `
-    precision mediump float;
-    void main() {
-      gl_FragColor = vec4(${r}, ${g}, ${b}, 1.0);
-    }
-  `;
-
-  const colorMaterial = new Material(vertexShaderCode, fragmentShaderCode);
+  const colorMaterial = new StandardMaterial(color);
 
   const mesh = new Mesh(geometryObject, colorMaterial, [0, 0, 0], [Math.PI/4, Math.PI/4, Math.PI/4], [1, 1, 1]);
 
@@ -132,7 +101,7 @@ function onContextCreate(gl: ExpoWebGLRenderingContext, geometry: string, color:
   gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(positionLocation);
 
-  const fov = Math.PI / 4; // 90° field of view
+  const fov = Math.PI / 4;
   const aspect = gl.drawingBufferWidth / gl.drawingBufferHeight;
   const near = 0.1;
   const far = 100.0;
@@ -152,7 +121,9 @@ function onContextCreate(gl: ExpoWebGLRenderingContext, geometry: string, color:
   const transformMatrixLoc = gl.getUniformLocation(program, 'uTransformMatrix');
   const viewMatrixLoc = gl.getUniformLocation(program, 'uViewMatrix');
   const projectionMatrixLoc = gl.getUniformLocation(program, 'uProjectionMatrix');
+  const colorLoc = gl.getUniformLocation(program, 'uColor');
   
+  gl.uniform3fv(colorLoc, mesh.material.color);
   gl.uniformMatrix4fv(transformMatrixLoc, false, new Float32Array(transformMatrix));
   gl.uniformMatrix4fv(viewMatrixLoc, false, new Float32Array(viewMatrix));
   gl.uniformMatrix4fv(projectionMatrixLoc, false, new Float32Array(projectionMatrix));
