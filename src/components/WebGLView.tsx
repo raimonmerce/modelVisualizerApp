@@ -10,11 +10,12 @@ import { StandardMaterial } from '../graphics/material/StandardMaterial';
 import { PhongMaterial } from '../graphics/material/PhongMaterial';
 import { Mesh } from '../graphics/Mesh';
 import { Renderer } from '../graphics/Renderer';
+import { GeometryConfig } from '../types';
 
 import type { ExpoWebGLRenderingContext } from 'expo-gl';
 
 type WebGLViewProps = {
-  geometry: 'cube' | 'sphere' | 'pyramid' | 'prism';
+  geometry: GeometryConfig;
   color: [number, number, number];
 };
 
@@ -33,7 +34,7 @@ export default function WebGLView({ geometry, color }: WebGLViewProps) {
 
 function onContextCreate(
   gl: ExpoWebGLRenderingContext,
-  geometry: string,
+  geometry: GeometryConfig,
   color: [number, number, number],
   rendererRef: React.MutableRefObject<Renderer | null>
 ) {
@@ -42,12 +43,17 @@ function onContextCreate(
   gl.enable(gl.DEPTH_TEST);
 
   const geometryObject: Geometry = (() => {
-    switch (geometry) {
-      case 'sphere': return new SphereGeometry(8, 8, 0.5);
-      case 'pyramid': return new PyramidGeometry(3, 1);
-      case 'prism': return new PrismGeometry(3, 1);
+    switch (geometry.type) {
       case 'cube':
-      default: return new CubeGeometry(1, 1.5, 2);
+        return new CubeGeometry(geometry.width, geometry.height, geometry.depth);
+      case 'sphere':
+        return new SphereGeometry(geometry.latitudeBands, geometry.longitudeBands, geometry.radius);
+      case 'pyramid':
+        return new PyramidGeometry(geometry.edges, geometry.height);
+      case 'prism':
+        return new PrismGeometry(geometry.edges, geometry.height);
+      default:
+        throw new Error('Unknown geometry type');
     }
   })();
 
@@ -58,7 +64,7 @@ function onContextCreate(
   //   [1.0, 1.0, 1.0],      // lightColor (white)
   //   64                   // shininess
   // );
-  const mesh = new Mesh(geometryObject, material, [0, 0, 0], [0, 0, 0], [1, 1, 1]);
+  const mesh = new Mesh(geometryObject, material, [0, 0, 0], [Math.PI/8, 0, 0], [1, 1, 1]);
 
   const renderer = new Renderer(gl);
   renderer.setMesh(mesh);

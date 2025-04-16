@@ -68,7 +68,7 @@ export class Renderer {
     // Matrices
     const fov = Math.PI / 4;
     const aspect = gl.drawingBufferWidth / gl.drawingBufferHeight;
-    const cameraPos: [number, number, number] = [0, 0, 3];
+    const cameraPos: [number, number, number] = [0, 0, 4];
 
     const transformMatrix = multiplyMatrices(
       createTranslationMatrix(...mesh.position),

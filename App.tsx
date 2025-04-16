@@ -16,6 +16,7 @@ import {
 import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
+import { GeometryConfig } from './src/types';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -29,8 +30,14 @@ function App(): React.JSX.Element {
 
   const safePadding = '5%';
 
-  const [selectedGeometry, setSelectedGeometry] = useState<'cube' | 'pyramid' | 'prism' | 'sphere'>('cube');
-  const [colorGeometry, setColorGeometry] = useState<[number, number, number]>([0.0, 1.0, 0.0]);
+  const [selectedGeometry, setSelectedGeometry] = useState<GeometryConfig>({
+    type: 'cube',
+    width: 1,
+    height: 1,
+    depth: 1
+  });
+
+  const [colorGeometry, setColorGeometry] = useState<[number, number, number]>([0.0, 0.0, 1.0]);
   
   return (
     <View style={backgroundStyle}>
@@ -65,35 +72,35 @@ function App(): React.JSX.Element {
             imageSource={assets.png.cubo}
             onPress={() => {
               setColorGeometry([0.0, 0.0, 1.0]);
-              setSelectedGeometry('cube');
+              setSelectedGeometry({ type: 'cube', width: 1, height: 1.5, depth: 1 });
             }}
           />
           <ImageButton
             imageSource={assets.png.piramide}
             onPress={() => {
               setColorGeometry([1.0, 0.0, 1.0]);
-              setSelectedGeometry('pyramid');
+              setSelectedGeometry({ type: 'pyramid', edges: 4, height: 1.2 });
             }}
           />
           <ImageButton
             imageSource={assets.png.tetraedro}
             onPress={() => {
               setColorGeometry([1.0, 0.0, 0.0]);
-              setSelectedGeometry('pyramid');
+              setSelectedGeometry({ type: 'pyramid', edges: 3, height: 1.2 });
             }}
           />
           <ImageButton
             imageSource={assets.png.prisma}
             onPress={() => {
               setColorGeometry([0.0, 1.0, 0.0]);
-              setSelectedGeometry('prism');
+              setSelectedGeometry({ type: 'prism', edges: 6, height: 1 });
             }}
           />
           <ImageButton
             imageSource={assets.png.esfera}
             onPress={() => {
               setColorGeometry([1.0, 1.0, 0.0]);
-              setSelectedGeometry('sphere');
+              setSelectedGeometry({ type: 'sphere', radius: 0.5, latitudeBands: 8, longitudeBands: 8 });
             }}
           />
         </View>
