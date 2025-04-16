@@ -1,5 +1,5 @@
 // WebGLView.tsx
-import React from 'react';
+import React, { useRef } from 'react';
 import { GLView } from 'expo-gl';
 import { Geometry } from '../graphics/geometry/Geometry';
 import { CubeGeometry } from '../graphics/geometry/CubeGeometry';
@@ -18,16 +18,24 @@ type WebGLViewProps = {
 };
 
 export default function WebGLView({ geometry, color }: WebGLViewProps) {
-    return (
+  const rendererRef = useRef<Renderer | null>(null);  
+  return (
       <GLView
         key={`${geometry}-${color.join(',')}`}
         style={{ width: 300, height: 300 }}
-        onContextCreate={(gl) => onContextCreate(gl, geometry, color)}
+        onContextCreate={
+          (gl) => onContextCreate(gl, geometry, color, rendererRef)
+        }
       />
     );
 }
 
-function onContextCreate(gl: ExpoWebGLRenderingContext, geometry: string, color: [number, number, number]) {
+function onContextCreate(
+  gl: ExpoWebGLRenderingContext,
+  geometry: string,
+  color: [number, number, number],
+  rendererRef: React.MutableRefObject<Renderer | null>
+) {
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
   gl.clearColor(1, 1, 1, 1);
   gl.enable(gl.DEPTH_TEST);
@@ -43,8 +51,11 @@ function onContextCreate(gl: ExpoWebGLRenderingContext, geometry: string, color:
   })();
 
   const material = new StandardMaterial(color);
-  const mesh = new Mesh(geometryObject, material, [0, 0, 0], [Math.PI/4, Math.PI/4, Math.PI/4], [1, 1, 1]);
+  const mesh = new Mesh(geometryObject, material, [0, 0, 0], [0, 0, 0], [1, 1, 1]);
 
   const renderer = new Renderer(gl);
-  renderer.render(mesh);
+  renderer.setMesh(mesh);
+  renderer.start();
+
+  rendererRef.current = renderer;
 }

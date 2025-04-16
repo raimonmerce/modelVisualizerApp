@@ -7,30 +7,43 @@ export function createProgramFromMaterial(
   material: Material
 ): WebGLProgram {
   const program = gl.createProgram();
-  if (!program) throw new Error('Unable to create program');
-
+  if (!program) {
+    const error = gl.getError();
+    console.error("WebGL error:", error); // This will help diagnose context issues
+    throw new Error('Unable to create program')
+  }
   const vertShader = compileShader(gl, gl.VERTEX_SHADER, material.vertexShader);
   const fragShader = compileShader(gl, gl.FRAGMENT_SHADER, material.fragmentShader);
+
+  if (!vertShader || !fragShader) {
+    throw new Error('Error');
+  }
 
   gl.attachShader(program, vertShader);
   gl.attachShader(program, fragShader);
   gl.linkProgram(program);
 
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.error('Program failed to link:', gl.getProgramInfoLog(program));
+    const infoLog = gl.getProgramInfoLog(program);
+    console.error("Program link error:", infoLog);
     throw new Error('Program link error');
   }
 
   return program;
 }
 
-function compileShader(gl: WebGLRenderingContext, type: number, source: string): WebGLShader {
-  const shader = gl.createShader(type)!;
+function compileShader(gl: WebGLRenderingContext, type: number, source: string): WebGLShader | null {
+  const shader = gl.createShader(type);
+  if (!shader) {
+    console.error('Error creating shader');
+    return null;
+  }
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.error('Shader compile error:', gl.getShaderInfoLog(shader));
-    throw new Error('Shader compile error');
+    console.error(`Shader compile error: ${gl.getShaderInfoLog(shader)}`);
+    gl.deleteShader(shader);
+    return null;
   }
   return shader;
 }
