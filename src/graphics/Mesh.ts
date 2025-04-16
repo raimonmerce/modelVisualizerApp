@@ -1,4 +1,4 @@
-import { Geometry } from './Geometry';
+import { Geometry } from './geometry/Geometry';
 import { Material } from './Material';
 
 export class Mesh {

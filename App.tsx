@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import WebGLView from './src/components/WebGLView';
 import ImageButton from './src/components/ImageButton';
@@ -21,44 +21,6 @@ type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
-export const GeometryTypes = {
-  Cubo: 'Cubo',
-  Piramide: 'Piramide',
-  Tetraedre: 'Tetraedre',
-  Prisma: 'Prisma',
-  Esfera: 'Esfera',
-} as const;
-
-function clickedGeometry(title: string) {
-  console.log("Test", title)
-}
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   const backgroundStyle = {
@@ -66,6 +28,8 @@ function App(): React.JSX.Element {
   };
 
   const safePadding = '5%';
+
+  const [selectedGeometry, setSelectedGeometry] = useState<'cube' | 'pyramid' | 'prism' | 'sphere'>('cube');
 
   return (
     <View style={backgroundStyle}>
@@ -93,37 +57,42 @@ function App(): React.JSX.Element {
           </View>
         </View>
         <View style={styles.container}>
-          <WebGLView />
+          <WebGLView geometry={selectedGeometry} color={[0.0, 1.0, 0.0]}/>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 20 }}>
           <ImageButton
             imageSource={assets.png.cubo}
             onPress={() => {
-              clickedGeometry(GeometryTypes.Cubo);
+              console.log("cube")
+              setSelectedGeometry('cube');
             }}
           />
           <ImageButton
             imageSource={assets.png.piramide}
             onPress={() => {
-              clickedGeometry(GeometryTypes.Piramide);
+              console.log("pyramid")
+              setSelectedGeometry('pyramid');
             }}
           />
           <ImageButton
             imageSource={assets.png.tetraedro}
             onPress={() => {
-              clickedGeometry(GeometryTypes.Tetraedre);
+              console.log("pyramid")
+              setSelectedGeometry('pyramid');
             }}
           />
           <ImageButton
             imageSource={assets.png.prisma}
             onPress={() => {
-              clickedGeometry(GeometryTypes.Prisma);
+              console.log("prism")
+              setSelectedGeometry('prism');
             }}
           />
           <ImageButton
             imageSource={assets.png.esfera}
             onPress={() => {
-              clickedGeometry(GeometryTypes.Esfera);
+              console.log("sphere")
+              setSelectedGeometry('sphere');
             }}
           />
         </View>
