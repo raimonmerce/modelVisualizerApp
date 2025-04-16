@@ -14,12 +14,12 @@ export class PyramidGeometry extends Geometry {
       const angle = i * angleStep;
       const x = radius * Math.cos(angle);
       const z = radius * Math.sin(angle);
-      vertices.push(x, 0, z); // y = 0 (base)
+      vertices.push(x, -height/2, z); // y = 0 (base)
     }
 
     // Apex vertex
     const apexIndex = vertices.length / 3;
-    vertices.push(0, height, 0); // Apex
+    vertices.push(0, height/2, 0); // Apex
 
     // Base center (for triangulation if needed)
     const baseCenterIndex = vertices.length / 3;

@@ -30,7 +30,8 @@ export default function AttributeSlider({
           maximumValue={max}
           step={step}
           value={value}
-          onValueChange={onChange}
+          onSlidingComplete={onChange}
+          onValueChange={() => {}}
         />
       </View>
     </View>

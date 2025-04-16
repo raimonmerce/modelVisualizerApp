@@ -15,16 +15,16 @@ export class PrismGeometry extends Geometry {
       const x = radius * Math.cos(angle);
       const z = radius * Math.sin(angle);
       // Base vertex (y = 0)
-      vertices.push(x, 0, z);
+      vertices.push(x, -height/2, z);
       // Top vertex (y = height)
-      vertices.push(x, height, z);
+      vertices.push(x, height/2, z);
     }
 
     // Center points for base and top
     const baseCenterIndex = vertices.length / 3;
     vertices.push(0, 0, 0); // Base center
     const topCenterIndex = vertices.length / 3;
-    vertices.push(0, height, 0); // Top center
+    vertices.push(0, height/2, 0); // Top center
 
     // Indices for base and top faces (triangle fan)
     for (let i = 0; i < numberEdges; i++) {
