@@ -2,47 +2,51 @@
 import { Geometry } from './Geometry';
 
 export class CubeGeometry extends Geometry {
-  constructor() {
+  constructor(width: number = 1, height: number = 1, depth: number = 1) {
+    const hw = width / 2;
+    const hh = height / 2;
+    const hd = depth / 2;
+
     const vertices = [
       // Front face
-      -0.5, -0.5,  0.5,  // 0
-       0.5, -0.5,  0.5,  // 1
-       0.5,  0.5,  0.5,  // 2
-      -0.5,  0.5,  0.5,  // 3
+      -hw, -hh,  hd,  // 0
+       hw, -hh,  hd,  // 1
+       hw,  hh,  hd,  // 2
+      -hw,  hh,  hd,  // 3
       // Back face
-      -0.5, -0.5, -0.5,  // 4
-       0.5, -0.5, -0.5,  // 5
-       0.5,  0.5, -0.5,  // 6
-      -0.5,  0.5, -0.5,  // 7
+      -hw, -hh, -hd,  // 4
+       hw, -hh, -hd,  // 5
+       hw,  hh, -hd,  // 6
+      -hw,  hh, -hd,  // 7
       // Top face
-      -0.5,  0.5,  0.5,  // 8
-       0.5,  0.5,  0.5,  // 9
-       0.5,  0.5, -0.5,  // 10
-      -0.5,  0.5, -0.5,  // 11
+      -hw,  hh,  hd,  // 8
+       hw,  hh,  hd,  // 9
+       hw,  hh, -hd,  // 10
+      -hw,  hh, -hd,  // 11
       // Bottom face
-      -0.5, -0.5,  0.5,  // 12
-       0.5, -0.5,  0.5,  // 13
-       0.5, -0.5, -0.5,  // 14
-      -0.5, -0.5, -0.5,  // 15
+      -hw, -hh,  hd,  // 12
+       hw, -hh,  hd,  // 13
+       hw, -hh, -hd,  // 14
+      -hw, -hh, -hd,  // 15
       // Right face
-       0.5, -0.5,  0.5,  // 16
-       0.5,  0.5,  0.5,  // 17
-       0.5,  0.5, -0.5,  // 18
-       0.5, -0.5, -0.5,  // 19
+       hw, -hh,  hd,  // 16
+       hw,  hh,  hd,  // 17
+       hw,  hh, -hd,  // 18
+       hw, -hh, -hd,  // 19
       // Left face
-      -0.5, -0.5,  0.5,  // 20
-      -0.5,  0.5,  0.5,  // 21
-      -0.5,  0.5, -0.5,  // 22
-      -0.5, -0.5, -0.5,  // 23
+      -hw, -hh,  hd,  // 20
+      -hw,  hh,  hd,  // 21
+      -hw,  hh, -hd,  // 22
+      -hw, -hh, -hd   // 23
     ];
 
     const indices = [
-      0, 1, 2, 0, 2, 3,   // front face
-      4, 5, 6, 4, 6, 7,   // back face
-      8, 9, 10, 8, 10, 11, // top face
-      12, 13, 14, 12, 14, 15, // bottom face
-      16, 17, 18, 16, 18, 19, // right face
-      20, 21, 22, 20, 22, 23  // left face
+      0, 1, 2, 0, 2, 3,     // Front
+      4, 5, 6, 4, 6, 7,     // Back
+      8, 9, 10, 8, 10, 11,  // Top
+      12, 13, 14, 12, 14, 15, // Bottom
+      16, 17, 18, 16, 18, 19, // Right
+      20, 21, 22, 20, 22, 23  // Left
     ];
 
     super(vertices, indices);

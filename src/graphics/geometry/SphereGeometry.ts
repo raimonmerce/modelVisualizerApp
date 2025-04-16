@@ -2,10 +2,11 @@
 import { Geometry } from './Geometry';
 
 export class SphereGeometry extends Geometry {
-  constructor() {
-    const latitudeBands = 30;
-    const longitudeBands = 30;
-    const radius = 0.5;
+  constructor(
+    latitudeBands: number = 30,
+    longitudeBands: number = 30,
+    radius: number = 0.5
+  ) {
     const vertices: number[] = [];
     const indices: number[] = [];
 
@@ -33,6 +34,7 @@ export class SphereGeometry extends Geometry {
       for (let longNumber = 0; longNumber < longitudeBands; longNumber++) {
         const first = (latNumber * (longitudeBands + 1)) + longNumber;
         const second = first + longitudeBands + 1;
+
         indices.push(first, second, first + 1);
         indices.push(second, second + 1, first + 1);
       }

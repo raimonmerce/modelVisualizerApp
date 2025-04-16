@@ -2,31 +2,50 @@
 import { Geometry } from './Geometry';
 
 export class PrismGeometry extends Geometry {
-  constructor() {
-    const vertices = [
-      // Base
-      -0.5, -0.5, -0.5,  // 0
-       0.5, -0.5, -0.5,  // 1
-       0.5, -0.5,  0.5,  // 2
-      -0.5, -0.5,  0.5,  // 3
-      // Top
-      -0.5,  0.5, -0.5,  // 4
-       0.5,  0.5, -0.5,  // 5
-       0.5,  0.5,  0.5,  // 6
-      -0.5,  0.5,  0.5   // 7
-    ];
+  constructor(numberEdges: number = 4, height: number = 1) {
+    const vertices: number[] = [];
+    const indices: number[] = [];
 
-    const indices = [
-      // Base
-      0, 1, 2, 0, 2, 3,
-      // Top
-      4, 5, 6, 4, 6, 7,
-      // Sides
-      0, 1, 5, 0, 5, 4,
-      1, 2, 6, 1, 6, 5,
-      2, 3, 7, 2, 7, 6,
-      3, 0, 4, 3, 4, 7
-    ];
+    const radius = 0.5; // Radius of the base polygon
+    const angleStep = (2 * Math.PI) / numberEdges;
+
+    // Generate base and top vertices
+    for (let i = 0; i < numberEdges; i++) {
+      const angle = i * angleStep;
+      const x = radius * Math.cos(angle);
+      const z = radius * Math.sin(angle);
+      // Base vertex (y = 0)
+      vertices.push(x, 0, z);
+      // Top vertex (y = height)
+      vertices.push(x, height, z);
+    }
+
+    // Center points for base and top
+    const baseCenterIndex = vertices.length / 3;
+    vertices.push(0, 0, 0); // Base center
+    const topCenterIndex = vertices.length / 3;
+    vertices.push(0, height, 0); // Top center
+
+    // Indices for base and top faces (triangle fan)
+    for (let i = 0; i < numberEdges; i++) {
+      const next = (i + 1) % numberEdges;
+      // Base triangle
+      indices.push(baseCenterIndex, i * 2, next * 2);
+      // Top triangle
+      indices.push(topCenterIndex, next * 2 + 1, i * 2 + 1);
+    }
+
+    // Side faces (two triangles per rectangular side)
+    for (let i = 0; i < numberEdges; i++) {
+      const next = (i + 1) % numberEdges;
+      const v0 = i * 2;
+      const v1 = next * 2;
+      const v2 = v1 + 1;
+      const v3 = v0 + 1;
+
+      indices.push(v0, v1, v2);
+      indices.push(v0, v2, v3);
+    }
 
     super(vertices, indices);
   }
