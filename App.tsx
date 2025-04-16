@@ -1,12 +1,9 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
 import type {PropsWithChildren} from 'react';
+import WebGLView from './src/components/WebGLView';
+import ImageButton from './src/components/ImageButton';
+import { assets } from './src/assets/assets.ts';
+import Toast from 'react-native-toast-message';
 import {
   ScrollView,
   StatusBar,
@@ -18,15 +15,23 @@ import {
 
 import {
   Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;
+
+export const GeometryTypes = {
+  Cubo: 'Cubo',
+  Piramide: 'Piramide',
+  Tetraedre: 'Tetraedre',
+  Prisma: 'Prisma',
+  Esfera: 'Esfera',
+} as const;
+
+function clickedGeometry(title: string) {
+  console.log("Test", title)
+}
 
 function Section({children, title}: SectionProps): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -56,20 +61,10 @@ function Section({children, title}: SectionProps): React.JSX.Element {
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
-
   const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    backgroundColor: "white",
   };
 
-  /*
-   * To keep the template simple and small we're adding padding to prevent view
-   * from rendering under the System UI.
-   * For bigger apps the recommendation is to use `react-native-safe-area-context`:
-   * https://github.com/AppAndFlow/react-native-safe-area-context
-   *
-   * You can read more about it here:
-   * https://github.com/react-native-community/discussions-and-proposals/discussions/827
-   */
   const safePadding = '5%';
 
   return (
@@ -80,32 +75,60 @@ function App(): React.JSX.Element {
       />
       <ScrollView
         style={backgroundStyle}>
-        <View style={{paddingRight: safePadding}}>
-          <Header/>
-        </View>
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
             paddingHorizontal: safePadding,
             paddingBottom: safePadding,
           }}>
-          <Section title="Step One">
-            AAAA Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-           AAAA Read the docs to discover what to do next:
-          </Section>
-          BBBB
-          <LearnMoreLinks />
+          <View style={styles.sectionContainer}>
+            <Text
+              style={[styles.sectionTitle]}>
+              {"Geometry Viewer"}
+            </Text>
+            <Text
+              style={[styles.sectionDescription]}>
+              Click the <Text style={styles.highlight}>geometries</Text> to visualize them and configure them.
+            </Text>
+          </View>
+        </View>
+        <View style={styles.container}>
+          <WebGLView />
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 20 }}>
+          <ImageButton
+            imageSource={assets.png.cubo}
+            onPress={() => {
+              clickedGeometry(GeometryTypes.Cubo);
+            }}
+          />
+          <ImageButton
+            imageSource={assets.png.piramide}
+            onPress={() => {
+              clickedGeometry(GeometryTypes.Piramide);
+            }}
+          />
+          <ImageButton
+            imageSource={assets.png.tetraedro}
+            onPress={() => {
+              clickedGeometry(GeometryTypes.Tetraedre);
+            }}
+          />
+          <ImageButton
+            imageSource={assets.png.prisma}
+            onPress={() => {
+              clickedGeometry(GeometryTypes.Prisma);
+            }}
+          />
+          <ImageButton
+            imageSource={assets.png.esfera}
+            onPress={() => {
+              clickedGeometry(GeometryTypes.Esfera);
+            }}
+          />
         </View>
       </ScrollView>
+      <Toast /> 
     </View>
   );
 }
@@ -126,6 +149,11 @@ const styles = StyleSheet.create({
   },
   highlight: {
     fontWeight: '700',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
