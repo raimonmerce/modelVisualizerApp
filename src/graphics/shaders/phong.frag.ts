@@ -5,14 +5,13 @@ const fragmentShader = `
     uniform vec3 uLightDirection;
     uniform vec3 uLightColor;
     uniform float uShininess;
-    uniform vec3 uCameraPosition;
 
     varying vec3 vNormal;
     varying vec3 vPosition;
 
     void main() {
         vec3 norm = normalize(vNormal);
-        vec3 lightDir = normalize(-uLightDirection); // Direction *to* light
+        vec3 lightDir = normalize(uLightDirection); // Direction *to* light
         vec3 viewDir = normalize(- vPosition); // assuming camera at origin
         vec3 reflectDir = reflect(-lightDir, norm);
 

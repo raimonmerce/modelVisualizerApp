@@ -95,11 +95,6 @@ export class Renderer {
       false,
       new Float32Array(normalMatrix)
     );
-    gl.uniformMatrix3fv(
-      gl.getUniformLocation(this.program, 'uCameraPosition'),
-      false,
-      new Float32Array(cameraPos)
-    );
     // Material-specific uniforms
     mesh.material.setUniforms(gl, this.program);
 

@@ -24,21 +24,14 @@ export default function GeometrySelector({ onSelectGeometry, onSelectColor }: Pr
         imageSource={assets.png.piramide}
         onPress={() => {
           onSelectColor([1.0, 0.0, 1.0]);
-          onSelectGeometry({ type: 'pyramid', edges: 4, height: 1.2 });
-        }}
-      />
-      <ImageButton
-        imageSource={assets.png.tetraedro}
-        onPress={() => {
-          onSelectColor([1.0, 0.0, 0.0]);
-          onSelectGeometry({ type: 'pyramid', edges: 3, height: 1.2 });
+          onSelectGeometry({ type: 'pyramid', edges: 4, height: 1.2, radius: 0.5 });
         }}
       />
       <ImageButton
         imageSource={assets.png.prisma}
         onPress={() => {
           onSelectColor([0.0, 1.0, 0.0]);
-          onSelectGeometry({ type: 'prism', edges: 6, height: 1 });
+          onSelectGeometry({ type: 'prism', edges: 6, height: 1, radius: 0.5 });
         }}
       />
       <ImageButton

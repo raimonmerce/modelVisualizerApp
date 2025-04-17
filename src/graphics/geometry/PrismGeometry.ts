@@ -2,11 +2,10 @@
 import { Geometry } from './Geometry';
 
 export class PrismGeometry extends Geometry {
-  constructor(numberEdges: number = 4, height: number = 1) {
+  constructor(numberEdges: number = 4, height: number = 1, radius: number = 0.5) {
     const vertices: number[] = [];
     const indices: number[] = [];
 
-    const radius = 0.5;
     const angleStep = (2 * Math.PI) / numberEdges;
 
     for (let i = 0; i < numberEdges; i++) {

@@ -1,11 +1,9 @@
 import { Geometry } from './Geometry';
 
 export class PyramidGeometry extends Geometry {
-  constructor(numberEdges: number = 4, height: number = 1) {
+  constructor(numberEdges: number = 4, height: number = 1, radius: number = 0.5) {
     const vertices: number[] = [];
     const indices: number[] = [];
-
-    const radius = 0.5;
     const angleStep = (2 * Math.PI) / numberEdges;
 
     // Base vertices (y = -height/2)

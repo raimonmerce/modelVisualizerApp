@@ -69,12 +69,14 @@ function createMesh(
       case 'pyramid':
         return new PyramidGeometry(
           geometryConfig.edges,
-          geometryConfig.height
+          geometryConfig.height,
+          geometryConfig.radius
         );
       case 'prism':
         return new PrismGeometry(
           geometryConfig.edges,
-          geometryConfig.height
+          geometryConfig.height,
+          geometryConfig.radius
         );
     }
   })();
@@ -82,9 +84,9 @@ function createMesh(
   //const material = new StandardMaterial(color);
   const material = new PhongMaterial(
     color,
-    [4.0, 0.0, -4.0],
+    [4.0, 4.0, 4.0],
     [1.0, 1.0, 1.0],
-    4.0
+    1.0
   );
   return new Mesh(geometry, material, [0, 0, 0], [0, 0, 0], [1, 1, 1]);
 }
