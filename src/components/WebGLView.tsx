@@ -113,7 +113,7 @@ function createMesh(
   //const material = new StandardMaterial(color);
   const material = new PhongMaterial(
     color,
-    lightDir,
+    [4.0, 0.0, 4.0],
     [1.0, 1.0, 1.0],
     1.0
   );
