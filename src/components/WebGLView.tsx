@@ -1,5 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { GLView } from 'expo-gl';
+import { DeviceMotion } from 'expo-sensors';
 import { CubeGeometry } from '../graphics/geometry/CubeGeometry';
 import { SphereGeometry } from '../graphics/geometry/SphereGeometry';
 import { PyramidGeometry } from '../graphics/geometry/PyramidGeometry';
@@ -20,13 +21,40 @@ type WebGLViewProps = {
 export default function WebGLView({ geometry, color }: WebGLViewProps) {
   const rendererRef = useRef<Renderer | null>(null);
   const glRef = useRef<ExpoWebGLRenderingContext | null>(null);
+  const [lightDirection, setLightDirection] = useState<[number, number, number]>([0, 0, -1]);
+
+
+  useEffect(() => {
+    DeviceMotion.setUpdateInterval(100);
+  
+    const subscription = DeviceMotion.addListener((data) => {
+      const rot = data.rotation;
+  
+      if (rot) {
+        // Estimate direction based on rotation (pitch, roll, yaw)
+        const { alpha, beta, gamma } = rot;
+  
+        // Convert to a direction vector - rough approximation
+        const x = Math.sin(gamma || 0);
+        const y = Math.sin(beta || 0);
+        const z = -Math.cos(alpha || 0);
+  
+        const length = Math.sqrt(x * x + y * y + z * z) || 1;
+        setLightDirection([x / length, y / length, z / length]);
+  
+        console.log('DeviceMotion Light Direction:', x, y, z);
+      }
+    });
+  
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     if (rendererRef.current && glRef.current) {
-      const mesh = createMesh(geometry, color);
+      const mesh = createMesh(geometry, color, lightDirection);
       rendererRef.current.setMesh(mesh);
     }
-  }, [geometry, color]);
+  }, [geometry, color, lightDirection]);
 
   return (
     <GLView
@@ -36,7 +64,7 @@ export default function WebGLView({ geometry, color }: WebGLViewProps) {
         gl.clearColor(1, 1, 1, 1);
         gl.enable(gl.DEPTH_TEST);
 
-        const mesh = createMesh(geometry, color);
+        const mesh = createMesh(geometry, color, lightDirection);
         const renderer = new Renderer(gl);
         renderer.setMesh(mesh);
         renderer.start();
@@ -50,7 +78,8 @@ export default function WebGLView({ geometry, color }: WebGLViewProps) {
 
 function createMesh(
   geometryConfig: GeometryConfig,
-  color: [number, number, number]
+  color: [number, number, number],
+  lightDir: [number, number, number]
 ): Mesh {
   const geometry: Geometry = (() => {
     switch (geometryConfig.type) {
@@ -84,7 +113,7 @@ function createMesh(
   //const material = new StandardMaterial(color);
   const material = new PhongMaterial(
     color,
-    [4.0, 4.0, 4.0],
+    lightDir,
     [1.0, 1.0, 1.0],
     1.0
   );

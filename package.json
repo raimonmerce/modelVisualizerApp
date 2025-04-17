@@ -15,6 +15,7 @@
     "expo-gl": "~15.0.5",
     "expo-gl-cpp": "^11.4.0",
     "expo-modules-core": "~2.2.3",
+    "expo-sensors": "^14.0.2",
     "expo-three": "^8.0.0",
     "react": "19.0.0",
     "react-native": "0.79.0",
