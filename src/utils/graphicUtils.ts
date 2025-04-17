@@ -1,6 +1,53 @@
 // graphicUtils.ts
 import { Material } from '../graphics/material/Material';
 
+export function mat3normalFromMat4(mat4: number[]): number[] {
+  // Extract 3x3 matrix
+  const m = [
+    mat4[0], mat4[1], mat4[2],
+    mat4[4], mat4[5], mat4[6],
+    mat4[8], mat4[9], mat4[10]
+  ];
+
+  // Invert + transpose
+  return transposeMatrix3(invertMatrix3(m));
+}
+
+export function transposeMatrix3(m: number[]): number[] {
+  return [
+    m[0], m[3], m[6],
+    m[1], m[4], m[7],
+    m[2], m[5], m[8]
+  ];
+}
+
+export function invertMatrix3(m: number[]): number[] {
+  const a00 = m[0], a01 = m[1], a02 = m[2];
+  const a10 = m[3], a11 = m[4], a12 = m[5];
+  const a20 = m[6], a21 = m[7], a22 = m[8];
+
+  const b01 = a22 * a11 - a12 * a21;
+  const b11 = -a22 * a10 + a12 * a20;
+  const b21 = a21 * a10 - a11 * a20;
+
+  let det = a00 * b01 + a01 * b11 + a02 * b21;
+  if (!det) return Array(9).fill(0);
+
+  det = 1.0 / det;
+
+  return [
+    b01 * det,
+    (-a22 * a01 + a02 * a21) * det,
+    (a12 * a01 - a02 * a11) * det,
+    b11 * det,
+    (a22 * a00 - a02 * a20) * det,
+    (-a12 * a00 + a02 * a10) * det,
+    b21 * det,
+    (-a21 * a00 + a01 * a20) * det,
+    (a11 * a00 - a01 * a10) * det
+  ];
+}
+
 // utils/createProgram.ts
 export function createProgramFromMaterial(
   gl: WebGLRenderingContext,

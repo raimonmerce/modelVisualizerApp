@@ -6,7 +6,7 @@ const vertexShader = `
     uniform mat4 uProjectionMatrix;
 
     void main() {
-    gl_Position = uProjectionMatrix * uViewMatrix * uTransformMatrix * vec4(position, 1.0);
+        gl_Position = uProjectionMatrix * uViewMatrix * uTransformMatrix * vec4(position, 1.0);
     }
 `;
 

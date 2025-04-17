@@ -1,4 +1,3 @@
-// src/graphics/PyramidGeometry.ts
 import { Geometry } from './Geometry';
 
 export class PyramidGeometry extends Geometry {
@@ -6,35 +5,35 @@ export class PyramidGeometry extends Geometry {
     const vertices: number[] = [];
     const indices: number[] = [];
 
-    const radius = 0.5; // Base polygon radius
+    const radius = 0.5;
     const angleStep = (2 * Math.PI) / numberEdges;
 
-    // Base vertices
+    // Base vertices (y = -height/2)
     for (let i = 0; i < numberEdges; i++) {
       const angle = i * angleStep;
       const x = radius * Math.cos(angle);
       const z = radius * Math.sin(angle);
-      vertices.push(x, -height/2, z); // y = 0 (base)
+      vertices.push(x, -height / 2, z);
     }
 
-    // Apex vertex
+    // Apex vertex (y = +height/2)
     const apexIndex = vertices.length / 3;
-    vertices.push(0, height/2, 0); // Apex
+    vertices.push(0, height / 2, 0);
 
-    // Base center (for triangulation if needed)
+    // Base center (used for triangle fan)
     const baseCenterIndex = vertices.length / 3;
-    vertices.push(0, 0, 0); // Optional: base center (can be used for triangle fan base)
+    vertices.push(0, -height / 2, 0);
 
-    // Base face triangulation (triangle fan)
+    // Invert winding order for base (CW from below)
     for (let i = 0; i < numberEdges; i++) {
       const next = (i + 1) % numberEdges;
       indices.push(baseCenterIndex, next, i);
     }
 
-    // Side faces (each is a triangle)
+    // Invert winding order for sides (CW from inside = CCW from outside)
     for (let i = 0; i < numberEdges; i++) {
       const next = (i + 1) % numberEdges;
-      indices.push(i, next, apexIndex);
+      indices.push(next, apexIndex, i);
     }
 
     super(vertices, indices);

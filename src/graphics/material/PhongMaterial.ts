@@ -11,7 +11,7 @@ export class PhongMaterial extends Material {
 
   constructor(
     color: [number, number, number],
-    lightDirection: [number, number, number] = [0.0, 0.0, -1.0],
+    lightDirection: [number, number, number] = [4.0, 0.0, -4.0],
     lightColor: [number, number, number] = [1.0, 1.0, 1.0],
     shininess: number = 32.0
   ) {

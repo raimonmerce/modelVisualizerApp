@@ -7,7 +7,8 @@ import {
     createTranslationMatrix,
     createRotationMatrix,
     createScaleMatrix,
-    multiplyMatrices
+    multiplyMatrices,
+    mat3normalFromMat4
 } from '../utils/graphicUtils';
 
 export class Renderer {
@@ -29,8 +30,6 @@ export class Renderer {
     const renderLoop = () => {
       if (!this.running || !this.mesh) return;
 
-      // 🔄 Update logic (e.g., rotation)
-      // this.mesh.rotation[0] += 0.01;
       this.mesh.rotation[1] += 0.01;
 
       this.render(this.mesh);
@@ -64,6 +63,9 @@ export class Renderer {
     const positionLoc = gl.getAttribLocation(this.program, 'position');
     gl.vertexAttribPointer(positionLoc, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(positionLoc);
+    gl.enable(gl.CULL_FACE);
+    gl.cullFace(gl.FRONT); // Cull back-facing triangles
+    gl.frontFace(gl.CCW);
 
     // Matrices
     const fov = Math.PI / 4;
@@ -85,6 +87,19 @@ export class Renderer {
     gl.uniformMatrix4fv(gl.getUniformLocation(this.program, 'uViewMatrix'), false, new Float32Array(viewMatrix));
     gl.uniformMatrix4fv(gl.getUniformLocation(this.program, 'uProjectionMatrix'), false, new Float32Array(projMatrix));
 
+    const modelMatrix = transformMatrix;
+    const normalMatrix = mat3normalFromMat4(modelMatrix); // You need to implement this
+
+    gl.uniformMatrix3fv(
+      gl.getUniformLocation(this.program, 'uNormalMatrix'),
+      false,
+      new Float32Array(normalMatrix)
+    );
+    gl.uniformMatrix3fv(
+      gl.getUniformLocation(this.program, 'uCameraPosition'),
+      false,
+      new Float32Array(cameraPos)
+    );
     // Material-specific uniforms
     mesh.material.setUniforms(gl, this.program);
 
